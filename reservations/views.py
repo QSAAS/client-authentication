@@ -4,6 +4,7 @@ from reservations.serializers import ReservationCreationSerializer
 from rest_framework.response import Response
 from django.core import serializers as core_serializer
 from reservations.services import publish_event
+from rest_framework import status
 
 
 class ReservationCreateView(generics.CreateAPIView):
@@ -29,7 +30,7 @@ class ReservationCreateView(generics.CreateAPIView):
 
         headers = self.get_success_headers(serializer.data)
         return Response(reservation_data,
-                        status=200,
+                        status=status.HTTP_201_CREATED,
                         headers=headers)
 
 
