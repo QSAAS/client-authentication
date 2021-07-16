@@ -8,7 +8,7 @@ class ReservationCreationSerializer(serializers.Serializer):
     queue_node_id = serializers.UUIDField()
 
     def create(self, validated_data):
-        node_id = validated_data["id"]
+        node_id = validated_data["queue_node_id"]
         request = self.context["request"]
 
         # atomic operation, if any function fails, all changes are rolled back
@@ -17,7 +17,16 @@ class ReservationCreationSerializer(serializers.Serializer):
             queue_node.last_number_in_queue = F("last_number_in_queue") + 1
             queue_node.save(update_fields=["last_number_in_queue"])
 
-            return Reservation.objects.create(
+            reservation = Reservation.objects.create(
                 client=request.user,
                 queue_node=queue_node,
             )
+            reservation.refresh_from_db()
+
+            return reservation
+
+
+class ReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reservation
+        fields = '__all__'

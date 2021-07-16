@@ -10,6 +10,7 @@ class QueueNode(models.Model):
 
 
 class Reservation(models.Model):
+    reservation_id = models.AutoField(primary_key=True)
     client = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
