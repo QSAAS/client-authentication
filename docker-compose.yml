@@ -1,0 +1,52 @@
+services:
+    django: &backend
+      build:
+        context: .
+      command: ["/app/.venv/bin/uvicorn", "asgi:application", "--host", "0.0.0.0", "--reload"]
+      ports:
+        - 127.0.0.1:8000:8000
+      volumes:
+        - ./:/app/
+      depends_on:
+        db:
+          condition: service_healthy
+        redis:
+          condition: service_started
+      environment:
+        - DJANGO_REDIS_URL=redis://redis:6379/0
+        - DATABASE_URL=postgres://clientauthuser:somepassword@db:5432/clientauth
+        - DJANGO_CORS_ORIGIN_REGEX_WHITELIST="^http://localhost$$,"
+        - DJANGO_ALLOWED_HOSTS=localhost
+        - DJANGO_CSRF_TRUSTED_ORIGINS=localhost
+        - DJANGO_SETTINGS_MODULE=config.prod  # modify this to test prod
+
+    redis:
+      image: redis:5.0
+      container_name: redis3
+
+    db:
+      image: postgres:12.3
+      environment:
+        - POSTGRES_DB=clientauth
+        - POSTGRES_USER=clientauthuser
+        - POSTGRES_PASSWORD=somepassword
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U safebuilt"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+      ports:
+        - 5432:5432
+
+    celeryworker:
+      <<: *backend
+      command: "/app/.venv/bin/celery -A config worker --concurrency=10 -l warning --beat"
+      ports: []
+      volumes: []
+
+    # run django migration on a separate service
+    migrate:
+      <<: *backend
+      command: "/app/.venv/bin/python manage.py migrate"
+      ports: []
+      volumes: []
