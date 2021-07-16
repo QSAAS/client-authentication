@@ -17,11 +17,11 @@ class ReservationCreateView(generics.CreateAPIView):
         # serializing reservation (model instance => python dictionary)
         reservation_data = core_serializer.serialize('python', [reservation, ])[0]
         reservation_id = reservation_data["pk"]
-        reservation_data = reservation_data["fields"]
         number_in_queue = reservation.queue_node.last_number_in_queue
         reservation_data["number_in_queue"] = number_in_queue
 
         # reformat dictionary
+        reservation_data = reservation_data["fields"]
         reservation_data["reservation_id"] = reservation_id
 
         # raise event
