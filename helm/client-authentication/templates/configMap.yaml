@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{.Chart.Name}}-configmap
+data:
+  SECRET_KEY: whatever
+  DATABASE_URL: postgres://postgres:pTPhR2iTMI@release1-postgresql/postgres
+  JWT_KEY: whatever
+  RABBIT_MQ_URL: "amqp://user:4SkOd6m5Bo@r1-rabbitmq.rabbitmq:5672/"
+  DJANGO_ALLOWED_HOSTS: "*"
+
+

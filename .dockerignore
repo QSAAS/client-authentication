@@ -226,3 +226,5 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 helm/
+Dockerfile
+docker-compose.yml
