@@ -7,7 +7,7 @@ QUEUE_NAME = 'EventBus'
 
 env = environ.Env()
 
-print(env["RABBIT_MQ_URL"])
+print(env.str("RABBIT_MQ_URL"))
 connection = pika.BlockingConnection(pika.ConnectionParameters(env.str("RABBIT_MQ_URL")))
 channel = connection.channel()
 
