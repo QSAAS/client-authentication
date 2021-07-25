@@ -28,6 +28,8 @@ RUN mkdir -p ./staticfiles
 RUN touch ./.env
 RUN cd /app && \
   mkdir -p static && \
+  SECRET_KEY=SOMESECRETKEY \
+  JWT_KEY=JWTSECRETKEY \
 #  DJANGO_SETTINGS_MODULE=config.prod \
   DJANGO_SECRET_KEY=whateversecretkey \
   DJANGO_ALLOWED_HOSTS=* \
