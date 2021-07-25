@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.9
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   libpng-dev \
@@ -42,6 +42,8 @@ RUN cd /app && \
 #COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 EXPOSE 8000
 ENV PATH="/app/.venv/bin/:${PATH}"
-RUN /bin/bash -c '/bin/chmod +x /app/docker-entrypoint.sh'
-ENTRYPOINT [ "/app/docker-entrypoint.sh" ]
-CMD [ "/app/.venv/bin/gunicorn", "--worker-class=uvicorn.workers.UvicornWorker", "asgi:application", "-b=0.0.0.0:5000"]
+RUN /bin/bash -c '/bin/chmod +x ./docker-entrypoint.sh'
+
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+
+CMD [ "/app/.venv/bin/gunicorn", "--worker-class=uvicorn.workers.UvicornWorker", "asgi:application", "-b=0.0.0.0:8000"]
