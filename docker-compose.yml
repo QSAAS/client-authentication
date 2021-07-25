@@ -1,61 +1,54 @@
+
+version: "3.9"
+   
 services:
-    django: &backend
-      build:
-        context: .
-      #      command: "sleep 5000"
-#      entrypoint: [ "/bin/bash", "-c", "--" ]
-#      entrypoint: ["./docker-entrypoint.sh"]
-#      command: [ "while true; do /bin/sleep 30; done;" ]
-#      command: ["python manage.py runserver "]
-#      command: ["/app/.venv/bin/uvicorn", "asgi:application", "--host", "0.0.0.0", "--reload"]
+  db:
+    image: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
 
-      ports:
-        - 127.0.0.1:8000:8000
-      volumes:
-        - django_volume:/app/
-#      depends_on:
-#        db:
-#          condition: service_healthy
-#        redis:
-#          condition: service_started
-      environment:
-        - DJANGO_REDIS_URL=redis://redis:6379/0
-        - DATABASE_URL=postgres://clientauthuser:somepassword@db:5432/clientauth
-        - DJANGO_CORS_ORIGIN_REGEX_WHITELIST="^http://localhost$$,"
-        - DJANGO_ALLOWED_HOSTS=localhost
-        - DJANGO_CSRF_TRUSTED_ORIGINS=localhost
-#        - DJANGO_SETTINGS_MODULE=config.prod  # modify this to test prod
+  web: &backend
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      - RABBIT_MQ_URL=amqp://rabbitmq
 
-    redis:
-      image: redis:5.0
-      container_name: redis3
 
-    db:
-      image: postgres:12.3
-      environment:
-        - POSTGRES_DB=clientauth
-        - POSTGRES_USER=clientauthuser
-        - POSTGRES_PASSWORD=somepassword
-#      healthcheck:
-#        test: ["CMD-SHELL", "pg_isready -U clientauth"]
-#        interval: 10s
-#        timeout: 5s
-#        retries: 5
-      ports:
-        - 5432:5432
+  migrate:
+    <<: *backend
+    command: "python manage.py migrate"
+    ports: []
+    volumes: []
 
-    celeryworker:
-      <<: *backend
-      command: "/app/.venv/bin/celery -A config worker --concurrency=10 -l warning --beat"
-      ports: []
-      volumes: []
 
-    # run django migration on a separate service
-    migrate:
-      <<: *backend
-      command: "/app/.venv/bin/python manage.py migrate"
-      ports: []
-      volumes: []
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+
+    ports:
+      - 5672:5672
+      - 15672:15672 # HTTP management port, use guest/guest for logging in
+
+    volumes:
+      - "rabbitmq-data:/var/lib/rabbitmq"
+
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
+
 
 volumes:
-  django_volume:
+  postgres:
+  rabbitmq-data:
