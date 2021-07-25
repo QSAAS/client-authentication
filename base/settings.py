@@ -73,14 +73,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'base.wsgi.application'
 
 DATABASES = {
-    'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'postgres',
-            'USER': 'postgres',
-            'PASSWORD': 'postgres',
-            'HOST': 'db',
-            'PORT': 5432,
-        }
+    "default": env.db("DATABASE_URL", default="postgres://127.0.0.1:5432/client_auth"),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
