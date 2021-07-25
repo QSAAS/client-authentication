@@ -16,8 +16,8 @@ WORKDIR /app
 #COPY pyproject.toml /app/pyproject.toml
 #COPY poetry.lock /app/poetry.lock
 #COPY poetry.toml /app/poetry.toml
-COPY . .
 RUN pip install poetry
+COPY . .
 
 RUN python -m venv .venv && poetry install --no-root
 
@@ -39,9 +39,9 @@ RUN cd /app && \
 
 
 #EXPOSE 5000
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+#COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 EXPOSE 8000
-ENV PATH='/app/.venv/bin/:$PATH'
-RUN chmod +x /app/docker-entrypoint.sh
+ENV PATH="/app/.venv/bin/:${PATH}"
+RUN /bin/bash -c '/bin/chmod +x /app/docker-entrypoint.sh'
 ENTRYPOINT [ "/app/docker-entrypoint.sh" ]
 CMD [ "/app/.venv/bin/gunicorn", "--worker-class=uvicorn.workers.UvicornWorker", "asgi:application", "-b=0.0.0.0:5000"]
