@@ -35,9 +35,11 @@ INSTALLED_APPS = [
 
     # third party apps
     'rest_framework',
+    'django_extensions',
 
     # local apps
     'authentication',
+    'reservations',
 ]
 
 MIDDLEWARE = [
