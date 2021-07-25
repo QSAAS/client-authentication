@@ -8,7 +8,7 @@ name: Lint, Test, Build and Publish docker images
 on:
   push:
     branches:
-      - 'development'
+      - 'master'
       - 'devops/*'
     tags:
       - 'v*'
