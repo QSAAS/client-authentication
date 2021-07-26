@@ -15,6 +15,7 @@ class ReservationCreateView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         reservation = serializer.save()
 
+        print(reservation)
         # serializing reservation (model instance => python dictionary)
         reservation_data = core_serializer.serialize('python', [reservation, ])[0]
         reservation_id = reservation_data["pk"]

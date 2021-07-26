@@ -1,4 +1,3 @@
-
 version: "3.9"
    
 services:
@@ -10,6 +9,7 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    restart: on-failure:10
 
   web: &backend
     build: .
@@ -30,6 +30,16 @@ services:
     command: "python manage.py migrate"
     ports: []
     volumes: []
+
+  event-worker:
+    <<: *backend
+    command: "python manage.py digest_event"
+    ports: []
+    volumes: []
+    depends_on:
+      - db
+      - rabbitmq
+    restart: on-failure:50
 
 
   rabbitmq:
