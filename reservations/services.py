@@ -13,7 +13,7 @@ channel = None
 
 def connect():
     global connection, channel
-    if connection is None:
+    if connection is None or connection.is_closed:
         connection = pika.BlockingConnection(pika.URLParameters(env.str("RABBIT_MQ_URL")))
         channel = connection.channel()
         channel.exchange_declare(exchange=EXCHANGE_NAME, exchange_type='fanout')

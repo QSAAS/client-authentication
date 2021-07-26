@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/qsaas/client-authentication
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "devops-helm"
+  tag: "master"
 
 imagePullSecrets:
   - name: github-registry
