@@ -19,6 +19,8 @@ class Command(BaseCommand):
         self.stdout.write("Connected to RMQ")
         channel = connection.channel()
         channel.queue_declare(queue='EventBus_ClientAuthentication')
+        channel.queue_bind(exchange='EventBus',
+                           queue='EventBus_ClientAuthentication')
         channel.basic_consume(queue='EventBus_ClientAuthentication',
                               auto_ack=True,
                               on_message_callback=self.digest)
@@ -26,7 +28,6 @@ class Command(BaseCommand):
 
     def digest(self, ch, method, properties, body):
         self.stdout.write("Received message %s" % body)
-        print(body)
         obj = json.loads(body)
         # todo future work
         if obj['eventName'] != "QueueNodeCreated":
