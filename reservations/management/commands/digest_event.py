@@ -27,6 +27,9 @@ class Command(BaseCommand):
     def digest(self, ch, method, properties, body):
         self.stdout.write("Received message %s" % body)
         obj = json.loads(body)
+        # todo future work
+        if obj['eventName'] != "QueueNodeCreated":
+            return
         queue_node_id = obj["id"]["id"]
         node = QueueNode(id=queue_node_id, last_number_in_queue=0)
         node.save()
